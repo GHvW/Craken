@@ -18,10 +18,21 @@ namespace Craken {
         public static Parser<string, A> Result<A>(A item) =>
             new Parser<string, A>((input) => new List<(A, string)>() { (item, input) });
 
-        public static Parser<string, char> Satisfy<A>(Func<char, bool> predicate) =>
+        public static Parser<string, char> Satisfy(Func<char, bool> predicate) =>
             Item().SelectMany(c => predicate(c)
                                        ? Result(c)
                                        : Zero<char>());
+        public static Parser<string, char> Char(char c) =>
+            Satisfy(item => item == c);
+
+        public static Parser<string, char> Digit() =>
+            Satisfy(c => c >= '0' && c <= '9');
+
+        public static Parser<string, char> Upper() =>
+            Satisfy(c => c >= 'A' && c <= 'Z');
+
+        public static Parser<string, char> Lower() =>
+            Satisfy(c => c >= 'a' && c <= 'z');
     }
 }
 
