@@ -26,9 +26,12 @@ namespace Craken {
                     .SelectMany(state => transform(state.Item1).Call(state.Item2))
                     .ToList());
 
-        public Parser<In, Out> Or(Parser<In, Out> parser) {
-            throw new NotImplementedException();
-        }
+        // rename this to Or?
+        public Parser<In, Out> Plus(Parser<In, Out> parser) =>
+            new Parser<In, Out>((input) => 
+                this.parse(input)
+                    .Concat(parser.parse(input))
+                    .ToList());
     }
 
 

@@ -22,17 +22,18 @@ namespace Craken {
             Item().SelectMany(c => predicate(c)
                                        ? Result(c)
                                        : Zero<char>());
-        public static Parser<string, char> Char(char c) =>
-            Satisfy(item => item == c);
 
-        public static Parser<string, char> Digit() =>
-            Satisfy(c => c >= '0' && c <= '9');
+        public static Parser<string, char> Char(char c) => Satisfy(item => item == c);
 
-        public static Parser<string, char> Upper() =>
-            Satisfy(c => c >= 'A' && c <= 'Z');
+        public static Parser<string, char> Digit() => Satisfy(c => c >= '0' && c <= '9');
 
-        public static Parser<string, char> Lower() =>
-            Satisfy(c => c >= 'a' && c <= 'z');
+        public static Parser<string, char> Upper() => Satisfy(c => c >= 'A' && c <= 'Z');
+
+        public static Parser<string, char> Lower() => Satisfy(c => c >= 'a' && c <= 'z');
+
+        public static Parser<string, char> Letter() => Lower().Plus(Upper());
+
+        public static Parser<string, char> AlphaNumeric() => Digit().Plus(Letter());
     }
 }
 
