@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using Xunit;
 
 namespace Craken.Tests {
@@ -12,8 +13,8 @@ namespace Craken.Tests {
 
             var result = Parse.Item().Call("Hello World!");
 
-            Assert.Equal('H', result[0].Item1);
-            Assert.Equal("ello World!", result[0].Item2);
+            Assert.Equal('H', result.First().Item1);
+            Assert.Equal("ello World!", result.First().Item2);
         }
 
         [Fact]
@@ -23,10 +24,10 @@ namespace Craken.Tests {
             var lowerHResult = parser.Call("hello World!");
             var upperHResult = parser.Call("Hello World!");
 
-            Assert.True(lowerHResult.Count == 0); // should be empty List
+            Assert.True(lowerHResult.Count() == 0); // should be empty List
 
-            Assert.Equal('H', upperHResult[0].Item1);
-            Assert.Equal("ello World!", upperHResult[0].Item2);
+            Assert.Equal('H', upperHResult.First().Item1);
+            Assert.Equal("ello World!", upperHResult.First().Item2);
         }
 
         [Fact]
@@ -35,9 +36,9 @@ namespace Craken.Tests {
             var result = Parse.Upper().Call("Hello World!");
             var badResult = Parse.Upper().Call("hello World!");
 
-            Assert.True(badResult.Count == 0);
-            Assert.Equal('H', result[0].Item1);
-            Assert.Equal("ello World!", result[0].Item2);
+            Assert.True(badResult.Count() == 0);
+            Assert.Equal('H', result.First().Item1);
+            Assert.Equal("ello World!", result.First().Item2);
         }
 
         [Fact]
@@ -46,9 +47,9 @@ namespace Craken.Tests {
             var result = Parse.Lower().Call("hello World!");
             var badResult = Parse.Lower().Call("Hello World!");
 
-            Assert.True(badResult.Count == 0);
-            Assert.Equal('h', result[0].Item1);
-            Assert.Equal("ello World!", result[0].Item2);
+            Assert.True(badResult.Count() == 0);
+            Assert.Equal('h', result.First().Item1);
+            Assert.Equal("ello World!", result.First().Item2);
         }
     }
 }

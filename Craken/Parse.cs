@@ -10,7 +10,7 @@ namespace Craken {
             new Parser<string, char>((input) =>
                 input.Any()
                     ? new List<(char, string)>() { (input[0], input[1..]) }
-                    : new List<(char, string)>());
+                    : Enumerable.Empty<(char, string)>());
 
         public static Parser<string, A> Zero<A>() =>
             new Parser<string, A>((input) => new List<(A, string)>());
