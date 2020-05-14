@@ -37,24 +37,16 @@ namespace Craken {
 
         public static Parser<string, string> Str(string str) => str switch {
                 "" => Result<string, string>(""),
-                //string s => Char(s[0])
-                //                .SelectMany(_ =>
-                //                    Str(s[1..])
-                //                        .SelectMany(_ => Result<string, string>(s))),
                 string s => (from _a in Char(s[0])
                              from _b in Str(s[1..])
                              select s),
             };
 
         public static Parser<string, string> Word() =>
-            //Letter()
-            //    .SelectMany(x => 
-            //        Word()
-            //            .SelectMany(xs => 
-            //                Result<string, string>(xs.Insert(0, x.ToString())))); // TODO - do something better here
-            from x in Letter()
-            from xs in Word()
-            select xs.Insert(0, x.ToString()); // fix this
+            (from x in Letter()
+             from xs in Word()
+             select xs.Insert(0, x.ToString())) // TODO - better way to handle this?
+            .Plus(Result<string, string>("")); 
     }
 }
 

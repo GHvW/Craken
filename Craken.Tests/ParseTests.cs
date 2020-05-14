@@ -51,5 +51,23 @@ namespace Craken.Tests {
             Assert.Equal('h', result.First().Item1);
             Assert.Equal("ello World!", result.First().Item2);
         }
+
+        [Fact]
+        public void Word_Test() {
+
+            var result = Parse.Word().Call("Hello World!");
+
+            Assert.Equal("Hello", result.First().Item1);
+            // TODO Complete this Test
+        }
+
+        [Fact]
+        public void Str_Test() {
+
+            var result = Parse.Str("Hello").Call("Hello World!");
+
+            Assert.Equal("Hello", result.First().Item1);
+            Assert.Equal(" World!", result.First().Item2);
+        }
     }
 }
