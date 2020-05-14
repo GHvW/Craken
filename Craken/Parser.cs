@@ -22,8 +22,15 @@ namespace Craken {
 
         public Parser<In, Result> SelectMany<Result>(Func<Out, Parser<In, Result>> transform) =>
             new Parser<In, Result>((input) => 
-                this.parse(input) // Call
+                this.parse(input)
                     .SelectMany(state => transform(state.Item1).Call(state.Item2)));
+
+        public Parser<In, Result> SelectMany<A, Result>(Func<Out, Parser<In, A>> transform, Func<Out, A, Result> selection) =>
+            new Parser<In, Result>((input) => 
+                this.parse(input) 
+                    .SelectMany(state => 
+                        transform(state.Item1).Call(state.Item2)
+                            .SelectMany(result => Parse.Result<In, Result>(selection(state.Item1, result.Item1)).Call(result.Item2))));
 
         // rename this to Or?
         public Parser<In, Out> Plus(Parser<In, Out> parser) =>
