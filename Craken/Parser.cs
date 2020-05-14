@@ -6,13 +6,13 @@ namespace Craken {
 
     public class Parser<In, Out> {
 
-        Func<In, IList<(Out, In)>> parse;
+        Func<In, IEnumerable<(Out, In)>> parse;
 
-        public Parser(Func<In, IList<(Out, In)>> parse) {
+        public Parser(Func<In, IEnumerable<(Out, In)>> parse) {
             this.parse = parse;
         }
 
-        public IList<(Out, In)> Call(In input) {
+        public IEnumerable<(Out, In)> Call(In input) {
             return this.parse(input);
         }
 
@@ -23,15 +23,13 @@ namespace Craken {
         public Parser<In, Result> SelectMany<Result>(Func<Out, Parser<In, Result>> transform) =>
             new Parser<In, Result>((input) => 
                 this.parse(input) // Call
-                    .SelectMany(state => transform(state.Item1).Call(state.Item2))
-                    .ToList());
+                    .SelectMany(state => transform(state.Item1).Call(state.Item2)));
 
         // rename this to Or?
         public Parser<In, Out> Plus(Parser<In, Out> parser) =>
             new Parser<In, Out>((input) => 
                 this.parse(input)
-                    .Concat(parser.parse(input))
-                    .ToList());
+                    .Concat(parser.parse(input)));
     }
 
 
