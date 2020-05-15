@@ -62,6 +62,15 @@ namespace Craken.Tests {
         }
 
         [Fact]
+        public void Many_Test() {
+
+            var result = Parse.Many(Parse.Letter()).Call("Hello World!");
+
+            Assert.Equal("Hello", result.First().Item1);
+            // TODO Complete this Test
+        }
+
+        [Fact]
         public void Str_Test() {
 
             var result = Parse.Str("Hello").Call("Hello World!");

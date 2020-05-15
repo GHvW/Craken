@@ -6,7 +6,7 @@ namespace Craken {
 
     public class Parser<In, Out> {
 
-        Func<In, IEnumerable<(Out, In)>> parse;
+        private readonly Func<In, IEnumerable<(Out, In)>> parse;
 
         public Parser(Func<In, IEnumerable<(Out, In)>> parse) {
             this.parse = parse;
@@ -20,11 +20,15 @@ namespace Craken {
             throw new NotImplementedException();
         }
 
+        // Monad Bind
         public Parser<In, Result> SelectMany<Result>(Func<Out, Parser<In, Result>> transform) =>
             new Parser<In, Result>((input) => 
                 this.parse(input)
                     .SelectMany(state => transform(state.Item1).Call(state.Item2)));
 
+        // this is to enable the query expression syntax.
+        // In the paper, it's mentioned (p. 12) that all combinators could be done using the `do` syntax instead of the builder expression syntax
+        // that is what I'm hoping to enable here
         public Parser<In, Result> SelectMany<A, Result>(Func<Out, Parser<In, A>> transform, Func<Out, A, Result> selection) =>
             new Parser<In, Result>((input) => 
                 this.parse(input) 
@@ -32,7 +36,8 @@ namespace Craken {
                         transform(state.Item1).Call(state.Item2)
                             .SelectMany(result => Parse.Result<In, Result>(selection(state.Item1, result.Item1)).Call(result.Item2))));
 
-        // rename this to Or?
+        // I originally thought this was the same as Or, but its not!!
+        // MonadPlus Plus
         public Parser<In, Out> Plus(Parser<In, Out> parser) =>
             new Parser<In, Out>((input) => 
                 this.parse(input)

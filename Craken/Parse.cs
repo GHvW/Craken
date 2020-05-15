@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace Craken {
+
+    // consider making these static on the parser class?
     public static class Parse {
 
         public static Parser<string, char> Item() =>
@@ -13,7 +15,8 @@ namespace Craken {
                     : Enumerable.Empty<(char, string)>());
 
         public static Parser<In, A> Zero<In, A>() =>
-            new Parser<In, A>((input) => new List<(A, In)>());
+            //new Parser<In, A>((input) => new List<(A, In)>());
+            new Parser<In, A>((input) => Enumerable.Empty<(A, In)>());
 
         public static Parser<In, A> Result<In, A>(A item) =>
             new Parser<In, A>((input) => new List<(A, In)>() { (item, input) });
@@ -36,17 +39,34 @@ namespace Craken {
         public static Parser<string, char> AlphaNumeric() => Digit().Plus(Letter());
 
         public static Parser<string, string> Str(string str) => str switch {
-                "" => Result<string, string>(""),
-                string s => (from _a in Char(s[0])
-                             from _b in Str(s[1..])
+                ""       => Result<string, string>(""),
+                string s => (from _x in Char(s[0])
+                             from _xs in Str(s[1..])
                              select s),
             };
 
+        // Plus on empty string is like a base case for the recursive call to Word.
+        // It is kind of like saying "Letter() ? EmptyString : theLetter + Word()"
+        // The difference being that, as said in the paper, it's non-deterministic
+        // so it will return results for intermediate results for each call to Word
         public static Parser<string, string> Word() =>
             (from x in Letter()
              from xs in Word()
              select xs.Insert(0, x.ToString())) // TODO - better way to handle this?
-            .Plus(Result<string, string>("")); 
+            .Plus(Result<string, string>(""));
+
+        public static Parser<string, string> Many(Parser<string, char> parser) =>
+            (from x in parser
+             from xs in Many(parser)
+             select xs.Insert(0, x.ToString())) // TODO - better way to handle this?
+            .Plus(Result<string, string>(""));
+
+        // use in place of Word for non-strings?
+        public static Parser<IEnumerable<A>, IEnumerable<A>> Many<A>(Parser<IEnumerable<A>, A> parser) =>
+            (from x in parser
+             from xs in Many(parser)
+             select xs.Prepend(x))
+            .Plus(Zero<IEnumerable<A>, IEnumerable<A>>());
     }
 }
 
