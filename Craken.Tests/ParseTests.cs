@@ -90,5 +90,50 @@ namespace Craken.Tests {
             Assert.Equal(Enumerable.Empty<(string, string)>(), failure);
             // TODO Complete this Test
         }
+
+        [Fact]
+        public void Natural_Test() {
+
+            var result = Parse.Natural().Call("100");
+            var result2 = Parse.Natural().Call("100a");
+            var failure1 = Parse.Natural().Call("a100");
+            var failure2 = Parse.Natural().Call("-100");
+
+            Assert.Equal(100, result.First().Item1);
+            Assert.Equal(100, result2.First().Item1);
+
+            Assert.Equal(Enumerable.Empty<(int, string)>(), failure1);
+            Assert.Equal(Enumerable.Empty<(int, string)>(), failure2);
+        }
+
+        [Fact]
+        public void Int_Test() {
+
+            var result = Parse.Int().Call("100");
+            var result2 = Parse.Int().Call("100a");
+            var result3 = Parse.Int().Call("-100");
+            var failure = Parse.Int().Call("a100");
+
+            Assert.Equal(100, result.First().Item1);
+            Assert.Equal(100, result2.First().Item1);
+            Assert.Equal(-100, result3.First().Item1);
+
+            Assert.Equal(Enumerable.Empty<(int, string)>(), failure);
+        }
+
+        [Fact]
+        public void Identifier_Test() {
+
+            var result = Parse.Identifier().Call("a100X");
+            var result2 = Parse.Identifier().Call("aHelloWorld thing");
+            var failure1 = Parse.Identifier().Call("100");
+            var failure2 = Parse.Identifier().Call("AHelloWorld");
+
+            Assert.Equal("a100X", result.First().Item1);
+            Assert.Equal("aHelloWorld", result2.First().Item1);
+
+            Assert.Equal(Enumerable.Empty<(string, string)>(), failure1);
+            Assert.Equal(Enumerable.Empty<(string, string)>(), failure2);
+        }
     }
 }

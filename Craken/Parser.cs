@@ -16,6 +16,8 @@ namespace Craken {
             return this.parse(input);
         }
 
+        public Parser<In, Out> Id() => this;
+
         public Parser<In, Result> Select<Result>(Func<Out, Result> transform) => 
             new Parser<In, Result>((input) => 
                 this.parse(input)

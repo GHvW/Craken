@@ -76,11 +76,23 @@ namespace Craken {
              from xs in Many(parser)
              select xs.Insert(0, x.ToString()));
 
+        public static Parser<string, string> Identifier() =>
+            (from x in Lower()
+             from xs in Many(AlphaNumeric())
+             select xs.Insert(0, x.ToString()));
+
         // c - '0' gets the number between 9 and 0 inclusive without needing to parse the int
         // 10 * acc + c shifts the digit on each iteration so that 8 + 7 + 1 + 5 = 8715 instead of 21
         //private static int Eval(string str) => str.Aggregate(0, (acc, c) => 10 * acc + (c - '0'));
         public static Parser<string, int> Natural() => 
             Many1(Digit()).Select(/*eval*/(str) => str.Aggregate(0, (acc, c) => 10 * acc + (c - '0')));
+
+        // not the "elegant" solution but I dont think we have a negate function in C# for int
+        public static Parser<string, int> Int() =>
+            (from _x in Char('-')
+             from n in Natural()
+             select -n)
+            .Plus(Natural());
     }
 }
 
