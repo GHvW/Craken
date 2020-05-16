@@ -16,9 +16,11 @@ namespace Craken {
             return this.parse(input);
         }
 
-        public Parser<In, Result> Select<Result>(Func<Out, Result> transform) {
-            throw new NotImplementedException();
-        }
+        public Parser<In, Result> Select<Result>(Func<Out, Result> transform) => 
+            new Parser<In, Result>((input) => 
+                this.parse(input)
+                    .Select(state => (transform(state.Item1), state.Item2)));
+
 
         // Monad Bind
         public Parser<In, Result> SelectMany<Result>(Func<Out, Parser<In, Result>> transform) =>

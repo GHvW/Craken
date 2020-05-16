@@ -78,5 +78,17 @@ namespace Craken.Tests {
             Assert.Equal("Hello", result.First().Item1);
             Assert.Equal(" World!", result.First().Item2);
         }
+
+        [Fact]
+        public void Many1_Test() {
+
+            var result = Parse.Many1(Parse.Char('a')).Call("aaab");
+            var failure = Parse.Many1(Parse.Char('a')).Call("baaa");
+
+            Assert.Equal("aaa", result.First().Item1);
+
+            Assert.Equal(Enumerable.Empty<(string, string)>(), failure);
+            // TODO Complete this Test
+        }
     }
 }
