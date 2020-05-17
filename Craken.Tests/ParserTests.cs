@@ -15,7 +15,7 @@ namespace Craken.Tests {
                           from y in Parse.Item<string, char>(Take.OneChar)
                           from z in Parse.Item<string, char>(Take.OneChar)
                           select x.ToString() + y.ToString() + z.ToString())
-                         .Call("Hello World!");
+                         ("Hello World!");
 
             Assert.Equal("Hel", result.First().Item1);
             Assert.Equal("lo World!", result.First().Item2);
