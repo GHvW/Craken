@@ -11,7 +11,7 @@ namespace Craken.Tests {
         [Fact]
         public void Item_Test() {
 
-            var result = Parse.Item<string, char>(Take.OneChar).Call("Hello World!");
+            var result = Parse.Item<string, char>(Take.OneChar)("Hello World!");
 
             Assert.Equal('H', result.First().Item1);
             Assert.Equal("ello World!", result.First().Item2);
@@ -21,8 +21,8 @@ namespace Craken.Tests {
         public void Satisfy_Test() {
             var parser = Parse.Satisfy((item) => item == 'H');
 
-            var lowerHResult = parser.Call("hello World!");
-            var upperHResult = parser.Call("Hello World!");
+            var lowerHResult = parser("hello World!");
+            var upperHResult = parser("Hello World!");
 
             Assert.True(lowerHResult.Count() == 0); // should be empty List
 
@@ -33,8 +33,8 @@ namespace Craken.Tests {
         [Fact]
         public void Upper_Test() {
 
-            var result = Parse.Upper().Call("Hello World!");
-            var badResult = Parse.Upper().Call("hello World!");
+            var result = Parse.Upper()("Hello World!");
+            var badResult = Parse.Upper()("hello World!");
 
             Assert.True(badResult.Count() == 0);
             Assert.Equal('H', result.First().Item1);
@@ -44,8 +44,8 @@ namespace Craken.Tests {
         [Fact]
         public void Lower_Test() {
 
-            var result = Parse.Lower().Call("hello World!");
-            var badResult = Parse.Lower().Call("Hello World!");
+            var result = Parse.Lower()("hello World!");
+            var badResult = Parse.Lower()("Hello World!");
 
             Assert.True(badResult.Count() == 0);
             Assert.Equal('h', result.First().Item1);
@@ -55,7 +55,7 @@ namespace Craken.Tests {
         [Fact]
         public void Word_Test() {
 
-            var result = Parse.Word().Call("Hello World!");
+            var result = Parse.Word()("Hello World!");
 
             Assert.Equal("Hello", result.First().Item1);
             // TODO Complete this Test
@@ -64,7 +64,7 @@ namespace Craken.Tests {
         [Fact]
         public void Many_Test() {
 
-            var result = Parse.Many(Parse.Letter()).Call("Hello World!");
+            var result = Parse.Many(Parse.Letter())("Hello World!");
 
             Assert.Equal("Hello", result.First().Item1);
             // TODO Complete this Test
@@ -73,7 +73,7 @@ namespace Craken.Tests {
         [Fact]
         public void Str_Test() {
 
-            var result = Parse.Str("Hello").Call("Hello World!");
+            var result = Parse.Str("Hello")("Hello World!");
 
             Assert.Equal("Hello", result.First().Item1);
             Assert.Equal(" World!", result.First().Item2);
@@ -82,8 +82,8 @@ namespace Craken.Tests {
         [Fact]
         public void Many1_Test() {
 
-            var result = Parse.Many1(Parse.Char('a')).Call("aaab");
-            var failure = Parse.Many1(Parse.Char('a')).Call("baaa");
+            var result = Parse.Many1(Parse.Char('a'))("aaab");
+            var failure = Parse.Many1(Parse.Char('a'))("baaa");
 
             Assert.Equal("aaa", result.First().Item1);
 
@@ -94,10 +94,10 @@ namespace Craken.Tests {
         [Fact]
         public void Natural_Test() {
 
-            var result = Parse.Natural().Call("100");
-            var result2 = Parse.Natural().Call("100a");
-            var failure1 = Parse.Natural().Call("a100");
-            var failure2 = Parse.Natural().Call("-100");
+            var result = Parse.Natural()("100");
+            var result2 = Parse.Natural()("100a");
+            var failure1 = Parse.Natural()("a100");
+            var failure2 = Parse.Natural()("-100");
 
             Assert.Equal(100, result.First().Item1);
             Assert.Equal(100, result2.First().Item1);
@@ -109,10 +109,10 @@ namespace Craken.Tests {
         [Fact]
         public void Int_Test() {
 
-            var result = Parse.Int().Call("100");
-            var result2 = Parse.Int().Call("100a");
-            var result3 = Parse.Int().Call("-100");
-            var failure = Parse.Int().Call("a100");
+            var result = Parse.Int()("100");
+            var result2 = Parse.Int()("100a");
+            var result3 = Parse.Int()("-100");
+            var failure = Parse.Int()("a100");
 
             Assert.Equal(100, result.First().Item1);
             Assert.Equal(100, result2.First().Item1);
@@ -124,10 +124,10 @@ namespace Craken.Tests {
         [Fact]
         public void Identifier_Test() {
 
-            var result = Parse.Identifier().Call("a100X");
-            var result2 = Parse.Identifier().Call("aHelloWorld thing");
-            var failure1 = Parse.Identifier().Call("100");
-            var failure2 = Parse.Identifier().Call("AHelloWorld");
+            var result = Parse.Identifier()("a100X");
+            var result2 = Parse.Identifier()("aHelloWorld thing");
+            var failure1 = Parse.Identifier()("100");
+            var failure2 = Parse.Identifier()("AHelloWorld");
 
             Assert.Equal("a100X", result.First().Item1);
             Assert.Equal("aHelloWorld", result2.First().Item1);
@@ -142,7 +142,7 @@ namespace Craken.Tests {
             var result = 
                 Parse.Int().SepBy1(Parse.Char(','))
                     .Bracket(Parse.Char('['), Parse.Char(']'))
-                    .Call("[100,200,300]");
+                    ("[100,200,300]");
 
             Assert.Equal(100, result.First().Item1.First());
             // TODO - Complete this
