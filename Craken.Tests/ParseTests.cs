@@ -87,7 +87,7 @@ namespace Craken.Tests {
 
             Assert.Equal("aaa", result.First().Item1);
 
-            Assert.Equal(Enumerable.Empty<(string, string)>(), failure);
+            Assert.Equal(Enumerable.Empty<(IEnumerable<char>, string)>(), failure);
             // TODO Complete this Test
         }
 
@@ -132,8 +132,8 @@ namespace Craken.Tests {
             Assert.Equal("a100X", result.First().Item1);
             Assert.Equal("aHelloWorld", result2.First().Item1);
 
-            Assert.Equal(Enumerable.Empty<(string, string)>(), failure1);
-            Assert.Equal(Enumerable.Empty<(string, string)>(), failure2);
+            Assert.Equal(Enumerable.Empty<(IEnumerable<char>, string)>(), failure1);
+            Assert.Equal(Enumerable.Empty<(IEnumerable<char>, string)>(), failure2);
         }
     }
 }
