@@ -16,25 +16,25 @@ namespace Craken {
         //            ? new List<(char, string)>() { (input[0], input[1..]) }
         //            : Enumerable.Empty<(char, string)>());
 
-        public static Parser<In, A> Zero<In, A>() =>
-            //new Parser<In, A>((input) => new List<(A, In)>());
-            new Parser<In, A>((input) => Enumerable.Empty<(A, In)>());
+        public static Parser<In, A> Zero<In, A>() => (input) => Enumerable.Empty<(A, In)>();
 
-        public static Parser<In, A> Result<In, A>(A item) =>
-            new Parser<In, A>((input) => new List<(A, In)>() { (item, input) });
+        public static Parser<In, A> Result<In, A>(A item) => (input) => new List<(A, In)>() { (item, input) };
 
         public static Parser<string, char> Satisfy(Func<char, bool> predicate) =>
             Item<string, char>(Take.OneChar).SelectMany(c => predicate(c)
                                                                 ? Result<string, char>(c)
                                                                 : Zero<string, char>());
 
-        public static Parser<string, char> Char(char c) => Satisfy(item => item == c);
+        public static Parser<byte[], int> Satisfy(Func<int, bool> predicate) =>
+            Int32().SelectMany(i => predicate(i) ? Result<byte[], int>(i) : Zero<byte[], int>());
 
-        public static Parser<string, char> Digit() => Satisfy(c => c >= '0' && c <= '9');
+        public static Parser<string, char> Char(char c) => Satisfy((char item) => item == c);
 
-        public static Parser<string, char> Upper() => Satisfy(c => c >= 'A' && c <= 'Z');
+        public static Parser<string, char> Digit() => Satisfy((char c) => c >= '0' && c <= '9');
 
-        public static Parser<string, char> Lower() => Satisfy(c => c >= 'a' && c <= 'z');
+        public static Parser<string, char> Upper() => Satisfy((char c) => c >= 'A' && c <= 'Z');
+
+        public static Parser<string, char> Lower() => Satisfy((char c) => c >= 'a' && c <= 'z');
 
         public static Parser<string, char> Letter() => Lower().Plus(Upper());
 
@@ -156,6 +156,8 @@ namespace Craken {
              from c in Item<byte[], byte>(Take.OneByte)
              from d in Item<byte[], byte>(Take.OneByte)
              select BitConverter.ToInt32(new byte[] {a, b, c, d}, 0));
+
+        public static Parser<byte[], int> Number(int nToCheck) => Satisfy((int n) => n == nToCheck);
     }
 }
 
