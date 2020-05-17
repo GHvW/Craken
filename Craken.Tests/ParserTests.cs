@@ -11,9 +11,9 @@ namespace Craken.Tests {
         [Fact]
         public void Query_Test() {
 
-            var result = (from x in Parse.Item()
-                          from y in Parse.Item()
-                          from z in Parse.Item()
+            var result = (from x in Parse.Item<string, char>(Take.OneChar)
+                          from y in Parse.Item<string, char>(Take.OneChar)
+                          from z in Parse.Item<string, char>(Take.OneChar)
                           select x.ToString() + y.ToString() + z.ToString())
                          .Call("Hello World!");
 

@@ -11,7 +11,7 @@ namespace Craken.Tests {
         [Fact]
         public void Item_Test() {
 
-            var result = Parse.Item().Call("Hello World!");
+            var result = Parse.Item<string, char>(Take.OneChar).Call("Hello World!");
 
             Assert.Equal('H', result.First().Item1);
             Assert.Equal("ello World!", result.First().Item2);

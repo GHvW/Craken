@@ -8,11 +8,13 @@ namespace Craken {
     // consider making these static on the parser class?
     public static partial class Parse {
 
-        public static Parser<string, char> Item() =>
-            new Parser<string, char>((input) =>
-                input.Any()
-                    ? new List<(char, string)>() { (input[0], input[1..]) }
-                    : Enumerable.Empty<(char, string)>());
+        public static Parser<In, Out> Item<In, Out>(Func<In, IEnumerable<(Out, In)>> taker) => new Parser<In, Out>(taker);
+
+        //public static Parser<string, char> Item() =>
+        //    new Parser<string, char>((input) =>
+        //        input.Any()
+        //            ? new List<(char, string)>() { (input[0], input[1..]) }
+        //            : Enumerable.Empty<(char, string)>());
 
         public static Parser<In, A> Zero<In, A>() =>
             //new Parser<In, A>((input) => new List<(A, In)>());
@@ -22,9 +24,9 @@ namespace Craken {
             new Parser<In, A>((input) => new List<(A, In)>() { (item, input) });
 
         public static Parser<string, char> Satisfy(Func<char, bool> predicate) =>
-            Item().SelectMany(c => predicate(c)
-                                       ? Result<string, char>(c)
-                                       : Zero<string, char>());
+            Item<string, char>(Take.OneChar).SelectMany(c => predicate(c)
+                                                                ? Result<string, char>(c)
+                                                                : Zero<string, char>());
 
         public static Parser<string, char> Char(char c) => Satisfy(item => item == c);
 
@@ -141,18 +143,18 @@ namespace Craken {
 
     public static partial class Parse {
 
-        public static Parser<byte[], byte> ByteItem() =>
-            new Parser<byte[], byte>((input) =>
-                input.Any()
-                    ? new List<(byte, byte[])>() { (input[0], input[1..]) }
-                    : Enumerable.Empty<(byte, byte[])>());
+        //public static Parser<byte[], byte> ByteItem() =>
+        //    new Parser<byte[], byte>((input) =>
+        //        input.Any()
+        //            ? new List<(byte, byte[])>() { (input[0], input[1..]) }
+        //            : Enumerable.Empty<(byte, byte[])>());
 
         // TODO - figure something out here
         public static Parser<byte[], int> Int32() =>
-            (from a in ByteItem()
-             from b in ByteItem()
-             from c in ByteItem()
-             from d in ByteItem()
+            (from a in Item<byte[], byte>(Take.OneByte)
+             from b in Item<byte[], byte>(Take.OneByte)
+             from c in Item<byte[], byte>(Take.OneByte)
+             from d in Item<byte[], byte>(Take.OneByte)
              select BitConverter.ToInt32(new byte[] {a, b, c, d}, 0));
     }
 }
