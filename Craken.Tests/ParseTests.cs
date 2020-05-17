@@ -135,5 +135,17 @@ namespace Craken.Tests {
             Assert.Equal(Enumerable.Empty<(IEnumerable<char>, string)>(), failure1);
             Assert.Equal(Enumerable.Empty<(IEnumerable<char>, string)>(), failure2);
         }
+
+        [Fact]
+        public void Bracket_Test() {
+
+            var result = 
+                Parse.Int().SepBy1(Parse.Char(','))
+                    .Bracket(Parse.Char('['), Parse.Char(']'))
+                    .Call("[100,200,300]");
+
+            Assert.Equal(100, result.First().Item1.First());
+            // TODO - Complete this
+        }
     }
 }

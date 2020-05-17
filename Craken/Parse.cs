@@ -115,7 +115,6 @@ namespace Craken {
              from n in Natural()
              select -n)
             .Plus(Natural());
-
     }
 
     public static partial class ParserExtensions {
@@ -126,8 +125,19 @@ namespace Craken {
                                    from y in parser
                                    select y)
              select xs.Prepend(x));
-    }
 
+        // TODO - curry this?
+        public static Parser<string, B> Bracket<A, B, C>(this Parser<string, B> parser, 
+                                                              Parser<string, A> open, 
+                                                              Parser<string, C> close) =>
+            (from _open in open
+             from x in parser
+             from _close in close
+             select x);
+
+        public static Parser<string, IEnumerable<A>> SepBy<A, B>(this Parser<string, A> parser, Parser<string, B> separator) =>
+            parser.SepBy1(separator).Plus(Parse.Zero<string, IEnumerable<A>>());
+    }
 
     public static partial class Parse {
 
@@ -137,10 +147,13 @@ namespace Craken {
                     ? new List<(byte, byte[])>() { (input[0], input[1..]) }
                     : Enumerable.Empty<(byte, byte[])>());
 
-        //public static Parser<byte[], int> Int32() =>
-        //    new Parser<byte[], int>((input) =>
-                
-                
+        // TODO - figure something out here
+        public static Parser<byte[], int> Int32() =>
+            (from a in ByteItem()
+             from b in ByteItem()
+             from c in ByteItem()
+             from d in ByteItem()
+             select BitConverter.ToInt32(new byte[] {a, b, c, d}, 0));
     }
 }
 
