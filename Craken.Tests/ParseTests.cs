@@ -19,7 +19,7 @@ namespace Craken.Tests {
 
         [Fact]
         public void Satisfy_Test() {
-            var parser = Parse.Satisfy((item) => item == 'H');
+            var parser = Parse.Satisfy((char item) => item == 'H');
 
             var lowerHResult = parser("hello World!");
             var upperHResult = parser("Hello World!");

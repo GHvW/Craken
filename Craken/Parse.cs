@@ -139,6 +139,20 @@ namespace Craken {
 
         public static Parser<string, IEnumerable<A>> SepBy<A, B>(this Parser<string, A> parser, Parser<string, B> separator) =>
             parser.SepBy1(separator).Plus(Parse.Zero<string, IEnumerable<A>>());
+
+        //public static Parser<string, B> Ops<A, B>(IEnumerable<(Parser<string, A>, B)> xs) =>
+
+
+        public static Parser<string, IEnumerable<A>> ChainLeft<A>(this Parser<string, A> parse, Parser<string, Func<A, A, A>> op) {
+
+            return parse.SelectMany(Rest(parse, op));
+
+            static Func<A, Parser<string, IEnumerable<A>>> Rest(Parser<string, A> parse, Parser<string, Func<A, A, A>> op) => (A x) =>
+                op
+                 .SelectMany(fn => parse.SelectMany(y => Rest(parse, op)(fn(x, y))))
+                 .Plus(Parse.Result<string, IEnumerable<A>>(new List<A>() { x }));
+        }
+
     }
 
     public static partial class Parse {
