@@ -22,10 +22,12 @@ namespace Craken {
 
             return Agg(it, fn);
 
-            static A Agg(IEnumerator<A> enumerator, Func<A, A, A> fn) =>
-                !enumerator.MoveNext()
-                    ? enumerator.Current
+            static A Agg(IEnumerator<A> enumerator, Func<A, A, A> fn) {
+                var previous = enumerator.Current;
+                return !enumerator.MoveNext()
+                    ? previous // this might be a bug
                     : fn(enumerator.Current, Agg(enumerator, fn));
+            }
         }
     }
 }

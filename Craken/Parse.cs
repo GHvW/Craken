@@ -103,13 +103,16 @@ namespace Craken {
         // c - '0' gets the number between 9 and 0 inclusive without needing to parse the int
         // 10 * acc + c shifts the digit on each iteration so that 8 + 7 + 1 + 5 = 8715 instead of 21
         //private static int Eval(string str) => str.Aggregate(0, (acc, c) => 10 * acc + (c - '0'));
-        public static Parser<string, int> Natural() =>
-            Many1(Digit()).Select(/*eval*/(str) => str.Aggregate(0, (acc, c) => 10 * acc + (c - '0')));
+        //public static Parser<string, int> Natural() =>
+        //    Many1(Digit()).Select(/*eval*/(str) => str.Aggregate(0, (acc, c) => 10 * acc + (c - '0')));
 
         //public static Parser<string, int> Natural() {
         //    return Many1(Digit()).Select(Eval);
         //    static int Eval(string str) => str.Aggregate(0, (acc, c) => 10 * acc + (c - '0'));
         //}
+
+        public static Parser<string, int> Natural() =>
+            Digit().Select(x => x - '0').ChainLeft1(Result<string, Func<int, int, int>>((m, n) => 10 * m + n));
 
         // not the "elegant" solution but I dont think we have a negate function in C# for int
         public static Parser<string, int> Int() =>
@@ -117,6 +120,13 @@ namespace Craken {
              from n in Natural()
              select -n)
             .Plus(Natural());
+
+
+        // TODO - foldr is used in the paper, do I really need foldr for ++? is it a lazy evaluation thing?
+        public static Parser<string, B> Ops<A, B>(IEnumerable<(Parser<string, A>, B)> xs) =>
+            xs.Select(x => x.Item1
+                            .SelectMany(_item => Result<string, B>(x.Item2)))
+              .Aggregate((acc, op) => acc.Plus(op));
     }
 
     public static partial class ParserExtensions {
@@ -129,8 +139,8 @@ namespace Craken {
              select xs.Prepend(x));
 
         // TODO - curry this?
-        public static Parser<string, B> Bracket<A, B, C>(this Parser<string, B> parser, 
-                                                              Parser<string, A> open, 
+        public static Parser<string, B> Bracket<A, B, C>(this Parser<string, B> parser,
+                                                              Parser<string, A> open,
                                                               Parser<string, C> close) =>
             (from _open in open
              from x in parser
@@ -140,20 +150,27 @@ namespace Craken {
         public static Parser<string, IEnumerable<A>> SepBy<A, B>(this Parser<string, A> parser, Parser<string, B> separator) =>
             parser.SepBy1(separator).Plus(Parse.Zero<string, IEnumerable<A>>());
 
-        //public static Parser<string, B> Ops<A, B>(IEnumerable<(Parser<string, A>, B)> xs) =>
-
-
-        public static Parser<string, IEnumerable<A>> ChainLeft<A>(this Parser<string, A> parse, Parser<string, Func<A, A, A>> op) {
+        public static Parser<string, A> ChainLeft1<A>(this Parser<string, A> parse, Parser<string, Func<A, A, A>> op) {
 
             return parse.SelectMany(Rest(parse, op));
 
-            static Func<A, Parser<string, IEnumerable<A>>> Rest(Parser<string, A> parse, Parser<string, Func<A, A, A>> op) => (A x) =>
+            static Func<A, Parser<string, A>> Rest(Parser<string, A> parse, Parser<string, Func<A, A, A>> op) => (A x) =>
                 op
                  .SelectMany(fn => parse.SelectMany(y => Rest(parse, op)(fn(x, y))))
-                 .Plus(Parse.Result<string, IEnumerable<A>>(new List<A>() { x }));
+                 .Plus(Parse.Result<string, A>(x));
         }
-
     }
+
+    //public static partial class Parse {
+
+    //    public static Parser<string, Func<int, int, int>> AddOp() => 
+    //        Ops(new List<(Parser<string, char>, Func<int, int, int>)>() { (Char('+'), Util.Add), (Char('-'), Util.Sub) });
+
+    //    public static Parser<string, char> Expr() => Factor().ChainLeft1<int>(AddOp());
+
+    //    public static Parser<string, int> Factor() =>
+    //        Natural().Plus<string, int>(Expr().Bracket(Char('('), Char(')')));
+    //}
 
     public static partial class Parse {
 

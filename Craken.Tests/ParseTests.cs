@@ -147,5 +147,14 @@ namespace Craken.Tests {
             Assert.Equal(100, result.First().Item1.First());
             // TODO - Complete this
         }
+
+        //[Fact]
+        //public void ChainLeft1_Test() {
+
+        //    var result = Parse.Chain
+
+        //    Assert.Equal(100, result.First().Item1.First());
+        //    // TODO - Complete this
+        //}
     }
 }
