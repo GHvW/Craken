@@ -19,7 +19,7 @@ namespace Craken.Tests {
 
         [Fact]
         public void Satisfy_Test() {
-            var parser = Parse.Satisfy((item) => item == 'H');
+            var parser = Parse.Satisfy((char item) => item == 'H');
 
             var lowerHResult = parser("hello World!");
             var upperHResult = parser("Hello World!");
@@ -147,5 +147,14 @@ namespace Craken.Tests {
             Assert.Equal(100, result.First().Item1.First());
             // TODO - Complete this
         }
+
+        //[Fact]
+        //public void ChainLeft1_Test() {
+
+        //    var result = Parse.Chain
+
+        //    Assert.Equal(100, result.First().Item1.First());
+        //    // TODO - Complete this
+        //}
     }
 }
