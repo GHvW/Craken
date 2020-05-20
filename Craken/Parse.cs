@@ -139,7 +139,7 @@ namespace Craken {
              select xs.Prepend(x));
 
         // TODO - curry this?
-        public static Parser<string, B> Bracket<A, B, C>(this Parser<string, B> parser,
+        public static Parser<string, B> BracketedBy<A, B, C>(this Parser<string, B> parser,
                                                               Parser<string, A> open,
                                                               Parser<string, C> close) =>
             (from _open in open
@@ -147,30 +147,79 @@ namespace Craken {
              from _close in close
              select x);
 
+        // TODO - curry this?
+        public static Parser<string, B> BracketedBy<A, B, C>(this Parser<string, B> parser,
+                                                              (Parser<string, A> Open, Parser<string, C> Close) openClose)  =>
+            (from _open in openClose.Open
+             from x in parser
+             from _close in openClose.Close
+             select x);
+
         public static Parser<string, IEnumerable<A>> SepBy<A, B>(this Parser<string, A> parser, Parser<string, B> separator) =>
             parser.SepBy1(separator).Plus(Parse.Zero<string, IEnumerable<A>>());
+
+        //public static Parser<string, A> ChainLeft1<A>(this Parser<string, A> parse, Parser<string, Func<A, A, A>> op) {
+
+        //    return parse.SelectMany(Rest(parse, op));
+
+        //    static Func<A, Parser<string, A>> Rest(Parser<string, A> parse_, Parser<string, Func<A, A, A>> op_) => (A x) =>
+        //        op_
+        //         .SelectMany(fn => parse_.SelectMany(y => Rest(parse_, op_)(fn(x, y))))
+        //         .Plus(Parse.Result<string, A>(x));
+        //}
 
         public static Parser<string, A> ChainLeft1<A>(this Parser<string, A> parse, Parser<string, Func<A, A, A>> op) {
 
             return parse.SelectMany(Rest(parse, op));
 
-            static Func<A, Parser<string, A>> Rest(Parser<string, A> parse, Parser<string, Func<A, A, A>> op) => (A x) =>
-                op
-                 .SelectMany(fn => parse.SelectMany(y => Rest(parse, op)(fn(x, y))))
-                 .Plus(Parse.Result<string, A>(x));
+            static Func<A, Parser<string, A>> Rest(Parser<string, A> parse_, Parser<string, Func<A, A, A>> op_) => (A x) =>
+                (from fn in op_
+                 from y in parse_
+                 from item in Rest(parse_, op_)(fn(x, y))
+                 select item)
+                .Plus(Parse.Result<string, A>(x));
         }
     }
 
-    //public static partial class Parse {
+    // Bracket ease
+    public static partial class Parse {
 
-    //    public static Parser<string, Func<int, int, int>> AddOp() => 
-    //        Ops(new List<(Parser<string, char>, Func<int, int, int>)>() { (Char('+'), Util.Add), (Char('-'), Util.Sub) });
+        public static (Parser<string, char>, Parser<string, char>) Parenthesis() =>
+            (Char('('), Char(')'));
 
-    //    public static Parser<string, char> Expr() => Factor().ChainLeft1<int>(AddOp());
+        public static (Parser<string, char>, Parser<string, char>) CurylBraces() =>
+            (Char('{'), Char('}'));
 
-    //    public static Parser<string, int> Factor() =>
-    //        Natural().Plus<string, int>(Expr().Bracket(Char('('), Char(')')));
-    //}
+        public static (Parser<string, char>, Parser<string, char>) SquareBrackets() =>
+            (Char('['), Char(']'));
+    }
+
+    /* Arithmetic Expressions
+     * 
+     * expr    ::== expr addop factor | factor
+     * addop   ::== + | -
+     * factor  ::== nat | ( expr )
+     * 
+     */
+    public static partial class Parse {
+
+        public static Parser<string, int> Expr() => Factor().ChainLeft1(AddOp());
+        //public static Parser<string, int> Expr() =>
+        //    (from x in Factor()
+        //     from fys in Many((from fn in AddOp()
+        //                       from y in Factor()
+        //                       select (fn, y)))
+        //     select fys.Aggregate(x, (acc, next) => next.fn(acc, next.y)));
+
+        public static Parser<string, Func<int, int, int>> AddOp() =>
+            Ops(new List<(Parser<string, char>, Func<int, int, int>)>() { (Char('+'), Util.Add), (Char('-'), Util.Sub) });
+
+        public static Parser<string, int> Factor() =>
+            Natural().Plus(Expr().BracketedBy(Parenthesis()));
+
+        //public static Parser<string, int> Factor() =>
+        //    Natural();
+    }
 
     public static partial class Parse {
 

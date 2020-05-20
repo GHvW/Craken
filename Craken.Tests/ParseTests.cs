@@ -137,14 +137,27 @@ namespace Craken.Tests {
         }
 
         [Fact]
-        public void Bracket_Test() {
+        public void BracketedBy_Test() {
 
             var result = 
                 Parse.Int().SepBy1(Parse.Char(','))
-                    .Bracket(Parse.Char('['), Parse.Char(']'))
+                    .BracketedBy(Parse.Char('['), Parse.Char(']'))
                     ("[100,200,300]");
 
+            var result2 = 
+                Parse.Int().SepBy1(Parse.Char(','))
+                    .BracketedBy(Parse.SquareBrackets())
+                    ("[100,200,300]");
+
+            var result3 =
+                Parse.Int()
+                     .SepBy1(Parse.Char(','))
+                     .BracketedBy(Parse.SquareBrackets())
+                     .SepBy1(Parse.Char(','))
+                     .BracketedBy(Parse.SquareBrackets())("[[100,200],[300,400]]");
+
             Assert.Equal(100, result.First().Item1.First());
+            Assert.Equal(100, result2.First().Item1.First());
             // TODO - Complete this
         }
 
@@ -156,5 +169,28 @@ namespace Craken.Tests {
         //    Assert.Equal(100, result.First().Item1.First());
         //    // TODO - Complete this
         //}
+
+        //[Fact]
+        //public void AddOp_Test() {
+
+        //    var result = Parse.AddOp(/);
+
+        //    //Assert.Equal(10, result);
+        //    Assert.True(true);
+        //    // TODO - Complete this
+        //}
+
+        [Fact]
+        public void ArithmeticExpression_Test() {
+
+            //var result = Parse.Expr()("10+2+3+4");
+            //var result = Parse.Expr()("10+(2-1)");
+            var result = Parse.Expr()("10");
+            var result2 = Parse.Expr()("10+20+3+4");
+
+            Assert.Equal(19, result.First().Item1);
+            Assert.Equal(37, result2.First().Item1);
+            // TODO - Complete this
+        }
     }
 }
