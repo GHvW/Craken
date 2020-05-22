@@ -187,6 +187,7 @@ namespace Craken.Tests {
             //var result = Parse.Expr()("10+(2-1)");
             var result = Parse.Expr()("10");
             var result2 = Parse.Expr()("10+20+3+4");
+            var result3 = Parse.Expr()("10+(20+3)+4");
 
             Assert.Equal(19, result.First().Item1);
             Assert.Equal(37, result2.First().Item1);

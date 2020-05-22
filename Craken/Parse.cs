@@ -70,11 +70,13 @@ namespace Craken {
             .Plus(Result<string, IEnumerable<A>>(Enumerable.Empty<A>()));
 
         // use in place of Word for non-strings?
+        // THIS IS NOT TESTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         public static Parser<IEnumerable<A>, IEnumerable<A>> Many<A>(Parser<IEnumerable<A>, A> parser) =>
             (from x in parser
              from xs in Many(parser)
              select xs.Prepend(x))
-            .Plus(Zero<IEnumerable<A>, IEnumerable<A>>());
+            //.Plus(Zero<IEnumerable<A>, IEnumerable<A>>());
+            .Plus(Result<IEnumerable<A>, IEnumerable<A>>(Enumerable.Empty<A>()));
 
         //public static Parser<string, string> Word() => Many(Letter());
         public static Parser<string, IEnumerable<char>> Word() => Many(Letter());
@@ -127,6 +129,15 @@ namespace Craken {
             xs.Select(x => x.Item1
                             .SelectMany(_item => Result<string, B>(x.Item2)))
               .Aggregate((acc, op) => acc.Plus(op));
+
+
+        public static Parser<string, B> Bracket<A, B, C>(Parser<string, B> parser,
+                                                              Parser<string, A> open,
+                                                              Parser<string, C> close) =>
+            (from _open in open
+             from x in parser
+             from _close in close
+             select x);
     }
 
     public static partial class ParserExtensions {
@@ -137,6 +148,8 @@ namespace Craken {
                                    from y in parser
                                    select y)
              select xs.Prepend(x));
+
+
 
         // TODO - curry this?
         public static Parser<string, B> BracketedBy<A, B, C>(this Parser<string, B> parser,
@@ -181,6 +194,26 @@ namespace Craken {
         }
     }
 
+    public static partial class Parse { // Lazies?
+        
+        // TODO - curry this?
+        public static Parser<string, B> BracketedBy<A, B, C>(this Func<Parser<string, B>> parser,
+                                                              Parser<string, A> open,
+                                                              Parser<string, C> close) =>
+            (from _open in open
+             from x in parser()
+             from _close in close
+             select x);
+
+        // TODO - curry this?
+        public static Parser<string, B> BracketedBy<A, B, C>(this Func<Parser<string, B>> parser,
+                                                              (Parser<string, A> Open, Parser<string, C> Close) openClose)  =>
+            (from _open in openClose.Open
+             from x in parser()
+             from _close in openClose.Close
+             select x);
+    }
+
     // Bracket ease
     public static partial class Parse {
 
@@ -214,11 +247,17 @@ namespace Craken {
         public static Parser<string, Func<int, int, int>> AddOp() =>
             Ops(new List<(Parser<string, char>, Func<int, int, int>)>() { (Char('+'), Util.Add), (Char('-'), Util.Sub) });
 
-        public static Parser<string, int> Factor() =>
-            Natural().Plus(Expr().BracketedBy(Parenthesis()));
+        //public static Parser<string, int> Factor() =>
+        //    Natural().Plus(Expr().BracketedBy(Parenthesis()));
 
         //public static Parser<string, int> Factor() =>
         //    Natural();
+
+        //public static Parser<string, int> Factor() =>
+        //    Expr().BracketedBy(Parenthesis()).Plus(Natural());
+
+        public static Parser<string, int> Factor() =>
+            Natural().Plus(((Func<Parser<string, int>>) Expr).BracketedBy(Parenthesis()));
     }
 
     public static partial class Parse {
