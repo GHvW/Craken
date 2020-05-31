@@ -2,6 +2,7 @@
 
 Cracken is a parser combinator library heavily influenced by Hutton and Meijer's [Monadic Parser Combinators](http://www.cs.nott.ac.uk/~pszgmh/monparsing.pdf)
 
+Cracken is currently under development
 
 Other reference material:
 
@@ -12,6 +13,6 @@ Other reference material:
 [Functional Programming in Scala - Chapter 9 Parser Combinators](https://livebook.manning.com/book/functional-programming-in-scala/chapter-9/4)
 
 
-Don't like this library but like the idea? \
+Like the ideam, but want a different library? \
 Check out [Sprache](https://github.com/sprache/Sprache). It's based on the same paper! \
 Check out [Pidgin](https://github.com/benjamin-hodgson/Pidgin) if you want a feature rich, speed focused library
