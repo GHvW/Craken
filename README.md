@@ -12,6 +12,8 @@ Other reference material:
 
 [Functional Programming in Scala - Chapter 9 Parser Combinators](https://livebook.manning.com/book/functional-programming-in-scala/chapter-9/4)
 
+[Revisiting Monadic Parsing in Haskell](https://vaibhavsagar.com/blog/2018/02/04/revisiting-monadic-parsing-haskell/)
+
 
 Like the ideam, but want a different library? \
 Check out [Sprache](https://github.com/sprache/Sprache). It's based on the same paper! \
